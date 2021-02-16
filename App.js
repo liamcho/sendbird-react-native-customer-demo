@@ -32,10 +32,10 @@ import SendBird from 'sendbird';
 /**
  * REPLACE WITH YOUR DATA HERE
  */
-const sb = new SendBird({ appId: 'YOUR APP ID HERE'});
-const userId = 'YOUR USER ID HERE';
+const sb = new SendBird({ appId: 'D1CB1742-A4A3-44B9-9E7F-126D14BAB34B' });
+const userId = 'test2';
 const accessToken = null;
-const groupChannelUrl = 'YOUR CHANNEL HERE';
+const groupChannelUrl = 'test-channel';
 
 const App = () => {
     /**
@@ -50,6 +50,12 @@ const App = () => {
                     console.log('Error listing group channel messages:');
                     console.log(error);
                 } else {
+                    /**
+                     * Serialization test
+                     */
+                    var x = groupChannel.serialize(); 
+                    console.log('Serialized:'); console.log(x);
+                    groupChannel = sb.GroupChannel.buildFromSerializedData(x);
                     /**
                      * List messages
                      */
@@ -72,14 +78,14 @@ const App = () => {
                             console.dir(error);
                             return;
                         }
-                        console.log('Messages:'); 
+                        console.log('Messages:');
                         for (const msg of messages) {
                             if (msg.messageType == 'file') {
                                 console.log(msg.url);
                             }
                         }
-                    });        
-                }    
+                    });
+                }
             });
         }
     });
