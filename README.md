@@ -11,6 +11,7 @@ https://reactnative.dev/docs/environment-setup
 After installing cocoapods, run the following commands:
 
 cd ios
+
 pod install
 
 ## Run app with IOS simulator
