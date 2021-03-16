@@ -1,3 +1,5 @@
+import SendBirdSyncManager from "sendbird-syncmanager";
+
 export const deserializeGroupChannel = (sb, groupChannel) => {
   /**
    * Serialization test
@@ -44,7 +46,7 @@ export const listMessages = (sb, groupChannel) => {
 export const listChannels = (sb) => {
   const channelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
   channelListQuery.limit = 20;
-  channelListQuery.order = 'chronological';
+  channelListQuery.order = 'latest_last_message';
   channelListQuery.includeEmpty = false;
 
   channelListQuery.next((list, err) => {
@@ -76,4 +78,11 @@ export const getMessageById = (sb, groupChannel) => {
       console.log('## messages: ', messages[0].messageId);
     });
   });
+}
+
+export const connectToSyncManager = async (sb, userId) => {
+  SendBirdSyncManager.sendBird = sb;
+  console.log('## sb: ', SendBirdSyncManager.sendBird);
+
+  return SendBirdSyncManager.setup(userId);
 }

@@ -29,7 +29,8 @@ import {
  * Sendbird
  */
 import SendBird from 'sendbird';
-import {listChannels} from "./src/Tests";
+import SendBirdSyncManager from "sendbird-syncmanager";
+
 /**
  * REPLACE WITH YOUR DATA HERE
  */
@@ -39,12 +40,42 @@ const accessToken = null;
 const groupChannelUrl = 'test-channel';
 
 const App = () => {
+    SendBirdSyncManager.sendBird = sb;
+    SendBirdSyncManager.setup(userId, () => {
+        sb.connect(userId, accessToken, (user, error) => {
+            console.log('## Connected error: ' + error);
+            if (!error) {
+                sb.GroupChannel.getChannel(
+                  'sendbird_group_channel_73419790_8daec77acb12cee22d873414ce772049bae2a9c6',
+                  (channel, err) => {
+                      if (err) throw err;
+                      channel.sendUserMessage('test message', (message, err) => {
+                          if (err) throw err;
+                          const channelListQuery = sb.GroupChannel.createMyGroupChannelListQuery();
+                          channelListQuery.limit = 20;
+                          channelListQuery.order = 'chronological';
+                          channelListQuery.includeEmpty = false;
+
+                          channelListQuery.next((list, err) => {
+                              if (err) throw err;
+                              console.log('## list:', list.length);
+
+                              list.forEach(channel => {
+                                  console.log('## channel: ', channel.url);
+                                  console.log('## time: ', channel.createdAt / 1000);
+                              });
+                          });
+                      });
+                  });
+            }
+        });
+    });
     /**
      * Connect to Sendbird
      */
-    sb.connect(userId, accessToken, (user, error) => {
-        console.log('Connected error: ' + error);
-        if (!error) {
+    // sb.connect(userId, accessToken, (user, error) => {
+    //     console.log('## Connected error: ' + error);
+    //     if (!error) {
             // Create a channel
             // sb.GroupChannel.createChannel([userId], (groupChannel, error) => {
             //     if (error) {
@@ -52,15 +83,20 @@ const App = () => {
             //         console.log(error);
             //     }
             // });
-            sb.GroupChannel.getChannel('sendbird_group_channel_73419790_a79f1a90153aa009552dae563bb3286cfd1e51ac', (channel, err) => {
-                if (err) throw err;
-                channel.sendUserMessage('test message', (message, err) => {
-                    if (err) throw err;
-                    listChannels(sb);
-                });
-            });
-        }
-    });
+
+            // connectToSyncManager(sb, userId).then(() => {
+                // sb.GroupChannel.getChannel(
+                //   'sendbird_group_channel_73419790_a79f1a90153aa009552dae563bb3286cfd1e51ac',
+                //   (channel, err) => {
+                //       if (err) throw err;
+                //       channel.sendUserMessage('test message', (message, err) => {
+                //           if (err) throw err;
+                //           listChannels(sb);
+                //       });
+                //   });
+            // });
+    //     }
+    // });
 
     return (
         <>
