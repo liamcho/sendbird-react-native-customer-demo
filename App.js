@@ -29,6 +29,7 @@ import {
  * Sendbird
  */
 import SendBird from 'sendbird';
+import {listChannels} from "./src/Tests";
 /**
  * REPLACE WITH YOUR DATA HERE
  */
@@ -44,48 +45,19 @@ const App = () => {
     sb.connect(userId, accessToken, (user, error) => {
         console.log('Connected error: ' + error);
         if (!error) {
-            console.log(user);
-            sb.GroupChannel.getChannel(groupChannelUrl, (groupChannel, error) => {
-                if (error) {
-                    console.log('Error listing group channel messages:');
-                    console.log(error);
-                } else {
-                    /**
-                     * Serialization test
-                     */
-                    var x = groupChannel.serialize(); 
-                    console.log('Serialized:'); console.log(x);
-                    groupChannel = sb.GroupChannel.buildFromSerializedData(x);
-                    /**
-                     * List messages
-                     */
-                    var prevMessageListQuery = groupChannel.createPreviousMessageListQuery();
-                    prevMessageListQuery.limit = 100;
-                    prevMessageListQuery.reverse = false;
-                    prevMessageListQuery.includeMetaArray = true;
-                    /**
-                     * Include threading and reply
-                     */
-                    prevMessageListQuery.includeReplies = true;
-                    prevMessageListQuery.includeThreadInfo = true;
-                    prevMessageListQuery.includeParentMessageText = true;
-                    /**
-                     * Get
-                     */
-                    prevMessageListQuery.load((messages, error) => {
-                        if (error) {
-                            console.log('Error listing messages for group channel:');
-                            console.dir(error);
-                            return;
-                        }
-                        console.log('Messages:');
-                        for (const msg of messages) {
-                            if (msg.messageType == 'file') {
-                                console.log(msg.url);
-                            }
-                        }
-                    });
-                }
+            // Create a channel
+            // sb.GroupChannel.createChannel([userId], (groupChannel, error) => {
+            //     if (error) {
+            //         console.log('Error creating group channel:');
+            //         console.log(error);
+            //     }
+            // });
+            sb.GroupChannel.getChannel('sendbird_group_channel_73419790_a79f1a90153aa009552dae563bb3286cfd1e51ac', (channel, err) => {
+                if (err) throw err;
+                channel.sendUserMessage('test message', (message, err) => {
+                    if (err) throw err;
+                    listChannels(sb);
+                });
             });
         }
     });
